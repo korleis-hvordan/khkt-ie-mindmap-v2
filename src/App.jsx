@@ -1,0 +1,190 @@
+import './App.css';
+
+import { useEffect, useRef, useState } from 'react';
+
+import { ActionIcon, Button, Dialog, Group, MantineProvider } from '@mantine/core';
+import { useDidUpdate, useDisclosure } from '@mantine/hooks';
+
+import { IconPlus } from '@tabler/icons-react';
+
+import Canvas from './components/Canvas';
+import Node from './components/Node';
+import Editor from './components/Editor';
+
+function App() {
+  const nodeRefs = useRef([]);
+  const [nodeList, setNl] = useState([]);
+  const [nodeGraph, setNg] = useState([]);
+  const [currNode, setCn] = useState(null);
+
+  const newRef = useRef(null);
+  const [newOpened, newHandler] = useDisclosure(false);
+
+  const editRef = useRef(null);
+  const [editOpened, editHandler] = useDisclosure(false);
+
+  const [connectMode, setCm] = useState(false);
+  const [connectSource, setCs] = useState(null);
+  const [connectTarget, setCt] = useState(null);
+
+  useDidUpdate(() => {
+    nodeRefs.current.forEach(e => e?.setConnect(connectMode));
+
+    if (connectMode) {
+      setCt(null);
+    }
+    else {
+      if (connectTarget !== null && !(nodeGraph[connectSource]?.has(connectTarget) ||
+          nodeGraph[connectTarget]?.has(connectSource))) {
+        setNg(curr => {
+          const copy = curr.slice();
+          if (typeof(copy[connectSource]) === 'object') {
+            copy[connectSource].add(connectTarget);
+          }
+          else {
+            copy[connectSource] = new Set([connectTarget]);
+          }
+
+          if (typeof(copy[connectTarget]) === 'object') {
+            copy[connectTarget].add(connectSource);
+          }
+          else {
+            copy[connectTarget] = new Set([connectSource]);
+          }
+
+          return copy;
+        });
+      }
+
+      setCs(null);
+      setCt(null);
+    }
+  }, [connectMode]);
+
+  const [disconnectMode, setDm] = useState(false);
+  const [disconnectSource, setDs] = useState(null);
+
+  useDidUpdate(() => {
+    nodeRefs.current.forEach(e => e?.setDisconnect(disconnectMode));
+
+    if (!disconnectMode) {
+      setDs(null);
+    }
+  }, [disconnectMode]);
+
+  const [colors, setColors] = useState([
+    "Dark", "Gray", "Red", "Pink", "Grape", "Violet", "Indigo", "Blue",
+    "Cyan", "Teal", "Green", "Lime", "Yellow", "Orange"
+  ]);
+  const [customColor, setCc] = useState('#ffffff');
+  const [useCustom, setUc] = useState(false);
+
+  useEffect(() => {
+    document.addEventListener("dragover", (event) => {
+      event.preventDefault();
+  });
+  }, []);
+
+  return (
+    <MantineProvider
+      theme={{
+        fontFamily: 'Indie Flower'
+      }}
+    >
+      <Canvas nodeList={nodeList} nodeGraph={nodeGraph} setNg={setNg}
+        nodeRefs={nodeRefs} currNode={currNode}
+        disconnectMode={disconnectMode} setDm={setDm}
+        disconnectSource={disconnectSource}
+      />
+      <ActionIcon variant="filled" radius="xl" size={60} color="red.7"
+        pos="fixed" bottom={40} right={60}
+        onClick={newHandler.open}
+        sx={{
+          zIndex: 1,
+          transition: '250ms ease',
+          '&:hover': {
+            rotate: '45deg',
+            transition: '250ms ease'
+          }
+        }}
+      >
+        <IconPlus size={32} />
+      </ActionIcon>
+      <Editor
+        ref={newRef} opened={newOpened} openHandler={newHandler}
+        iColor="Red" iSubject="" iBody="" iFile={null}
+        colors={colors} setColors={setColors}
+        customColor={customColor} setCc={setCc}
+        useCustom={useCustom} setUc={setUc}
+        action="Publish"
+        actionOnClick={() => {
+          console.log(newRef.current.getFile());
+          const index = nodeList.length;
+          setNl(curr =>
+            [...curr,
+              <Node index={index} pos={{ x: 0, y: 0 }}
+                iColor={newRef.current.getColor()}
+                iSubject={newRef.current.getSubject()}
+                iBody={newRef.current.getBody()}
+                iFile={newRef.current.getFile()}
+                setCn={setCn} setNl={setNl}
+                nodeGraph={nodeGraph} setNg={setNg}
+                connectMode={connectMode} setCm={setCm}
+                setCs={setCs} setCt={setCt}
+                disconnectMode={disconnectMode} setDm={setDm} setDs={setDs}
+                editHandler={editHandler}
+                ref={e => nodeRefs.current[index] = e}
+                key={index}
+              />
+            ]
+          );
+
+          newRef.current.setSubject('');
+          newRef.current.setBody('');
+          newRef.current.setFile(null);
+          newHandler.close();
+        }}
+      />
+      <Editor ref={editRef}
+        iColor={nodeRefs.current[currNode?.index]?.getColor() ?? "Red"}
+        iSubject={nodeRefs.current[currNode?.index]?.getSubject() ?? ""}
+        iBody={nodeRefs.current[currNode?.index]?.getBody() ?? ""}
+        iFile={nodeRefs.current[currNode?.index]?.getFile() ?? null}
+        key={currNode?.index} // ao ma vcl
+        colors={colors} setColors={setColors}
+        customColor={customColor} setCc={setCc}
+        useCustom={useCustom} setUc={setUc}
+        opened={editOpened} openHandler={editHandler}
+        action="Update"
+        actionOnClick={() => {
+          const currRef = nodeRefs.current[currNode?.index];
+          currRef.setColor(editRef.current.getColor());
+          currRef.setSubject(editRef.current.getSubject());
+          currRef.setBody(editRef.current.getBody());
+          currRef.setFile(editRef.current.getFile());
+
+          editHandler.close();
+        }}
+      />
+      <Dialog opened={connectMode} radius="lg" py="xs" fz="xl" w="fit-content"
+        position={{ bottom: 20, left: 20 }}
+      >
+        <Group>
+          Pick a post to connect to
+          <Button fz="xl" onClick={() => setCm(false)}>Cancel</Button>
+        </Group>
+      </Dialog>
+      <Dialog opened={disconnectMode} radius="lg" py="xs" fz="xl" w="fit-content"
+        position={{ bottom: 20, left: 20 }}
+      >
+        <Group>
+          Pick a post to disconnect from
+          <Button fz="xl" onClick={() => setDm(false)}>Cancel</Button>
+        </Group>
+      </Dialog>
+    </MantineProvider>
+  );
+}
+
+export default App;
+// h₂ólyoes ĝʰmónes h₁léwdʰeroes somHóeskʷe gʷr̥Htóteh₂ti h₃r̥ĝtúsukʷe ĝn̥h₁yóntor. éybʰos dh₃tóy ménos k̂ḗrkʷe h₁stés h₂énteroeykʷe sm̥h₂éleyes bʰréh₂tr̥bʰos swé h₂éĝoyh₁n̥t.
