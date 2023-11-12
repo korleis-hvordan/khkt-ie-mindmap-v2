@@ -1,20 +1,20 @@
 body {
   margin: 0;
-  overscroll-behavior-y: none;
+  overscroll-behavior: none;
 }
 
 /* prevent pull-to-refresh for Safari 16+ */
 @media screen and (pointer: coarse) {
-  @supports (-webkit-backdrop-filter: blur(1px)) and (overscroll-behavior-y: none)  {
+  @supports (-webkit-backdrop-filter: blur(1px)) and (overscroll-behavior: none)  {
     html {
       min-height: 100.3%;
-      overscroll-behavior-y: none;
+      overscroll-behavior: none;
     }
   }
 }
 /* prevent pull-to-refresh for Safari 9~15 */
 @media screen and (pointer: coarse) {
-  @supports (-webkit-backdrop-filter: blur(1px)) and (not (overscroll-behavior-y: none))  {
+  @supports (-webkit-backdrop-filter: blur(1px)) and (not (overscroll-behavior: none))  {
     html {
       height: 100%;
       overflow: hidden;

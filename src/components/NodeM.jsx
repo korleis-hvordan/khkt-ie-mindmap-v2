@@ -104,7 +104,7 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
       setAmX(false);
     }
     
-    if (offset.y + initialImp.y - scrollY > viewport.height - 10) {
+    if (offset.y + initialImp.y - scrollY > viewport.height - 50) {
       if (!autoMoveY) {
         setAmY(true);
       }
@@ -200,6 +200,12 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
         setOffset({ x: touch.pageX - initialImp.x, y: touch.pageY - initialImp.y });
       }}
       onTouchEnd={() => {
+        if (autoMoveX) {
+          setAmX(false);
+        }
+        if (autoMoveY) {
+          setAmY(false);
+        }
         setMove(false);
       }}
     >
@@ -313,12 +319,21 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
             cursor: 'nwse-resize'
           }
         }}
-        onDragStart={e => {
-          setIimp({ x: e.clientX, y: e.clientY });
+        onTouchStart={e => {
+          e.stopPropagation();
+          const evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+          const touch = evt.touches[0] || evt.changedTouches[0];
+          setIimp({ x: touch.pageX, y: touch.pageY });
           setIw(width);
         }}
-        onDrag={e => setWidth(initialWidth + e.clientX - initialImp.x)}
-        onDragEnd={e => setWidth(initialWidth + e.clientX - initialImp.x)} // tao deo hieu sao
+        onTouchMove={e => {
+          e.stopPropagation();
+          const evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+          const touch = evt.touches[0] || evt.changedTouches[0];
+          console.log(initialImp.x, touch.pageX);
+          setWidth(initialWidth + touch.pageX - initialImp.x);
+        }}
+        onTouchEnd={e => e.stopPropagation()}
       />
       <Text fz="lg">{body}</Text>
       {connect && self && <Button
