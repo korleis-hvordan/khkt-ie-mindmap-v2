@@ -136,11 +136,11 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, se
     
   const amIntervalX = useInterval(() => {
     forceUpdate();
-    scrollTo(scrollX + 8, scrollY);
+    scrollTo(document.body.scrollWidth, scrollY);
   }, 1);
   const amIntervalY = useInterval(() => {
     forceUpdate();
-    scrollTo(scrollX, scrollY + 8);
+    scrollTo(scrollX, document.body.scrollHeight);
   }, 1);
 
   useDidUpdate(() => {

@@ -116,11 +116,11 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
     
   const amIntervalX = useInterval(() => {
     forceUpdate();
-    scrollTo(scrollX + 8, scrollY);
+    scrollTo(document.body.scrollWidth, scrollY);
   }, 1);
   const amIntervalY = useInterval(() => {
     forceUpdate();
-    scrollTo(scrollX, scrollY + 8);
+    scrollTo(scrollX, document.body.scrollHeight);
   }, 1);
 
   useDidUpdate(() => {
@@ -186,7 +186,8 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
         color: getTextColor(
           theme.colors[lColor]?.[theme.primaryShade[theme.colorScheme]] ?? color,
           '#ffffff', '#000000'
-        ) 
+        ),
+        touchAction: 'none'
       })}
       onTouchStart={e => {
         setMove(true);
