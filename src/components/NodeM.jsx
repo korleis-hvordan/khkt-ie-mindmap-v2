@@ -95,7 +95,7 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
   const [autoMoveY, setAmY] = useState(false);
 
   useDidUpdate(() => {
-    if (offset.x + initialImp.x > viewport.width - 100) {
+    if (offset.x + initialImp.x - scrollX > viewport.width - 10) {
       if (!autoMoveX) {
         setAmX(true);
       }
@@ -104,7 +104,7 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
       setAmX(false);
     }
     
-    if (offset.y + initialImp.y > viewport.height - 100) {
+    if (offset.y + initialImp.y - scrollY > viewport.height - 10) {
       if (!autoMoveY) {
         setAmY(true);
       }
