@@ -95,7 +95,7 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
   const [autoMoveY, setAmY] = useState(false);
 
   useDidUpdate(() => {
-    if (offset.x + initialImp.x - scrollX > viewport.width - 10) {
+    if (offset.x + initialImp.x - scrollX > viewport.width - 50) {
       if (!autoMoveX) {
         setAmX(true);
       }
@@ -201,12 +201,8 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
         setOffset({ x: touch.pageX - initialImp.x, y: touch.pageY - initialImp.y });
       }}
       onTouchEnd={() => {
-        if (autoMoveX) {
-          setAmX(false);
-        }
-        if (autoMoveY) {
-          setAmY(false);
-        }
+        amIntervalX.stop();
+        amIntervalY.stop();
         setMove(false);
       }}
     >
@@ -312,7 +308,7 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
           }}
         />
       }
-      <Box pos="absolute" bottom={0} right={0} bg="black" h={10} w={10} draggable={true}
+      <Box pos="absolute" bottom={0} right={0} bg="black" h={20} w={20} draggable={true}
         sx={{
           borderTopLeftRadius: '100%',
           borderBottomRightRadius: '100%',
@@ -331,7 +327,6 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
           e.stopPropagation();
           const evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
           const touch = evt.touches[0] || evt.changedTouches[0];
-          console.log(initialImp.x, touch.pageX);
           setWidth(initialWidth + touch.pageX - initialImp.x);
         }}
         onTouchEnd={e => e.stopPropagation()}

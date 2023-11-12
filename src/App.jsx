@@ -122,8 +122,7 @@ function App() {
           const index = nodeList.length;
           setNl(curr =>
             [...curr,
-              ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) ||
-                (navigator.msMaxTouchPoints > 0) ?
+              window.ontouchstart !== undefined ?
               <NodeM index={index} pos={{ x: 0, y: 0 }}
                 iColor={newRef.current.getColor()}
                 iSubject={newRef.current.getSubject()}
