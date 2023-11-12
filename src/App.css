@@ -1,6 +1,7 @@
 body {
   margin: 0;
   overscroll-behavior: none;
+  overflow: hidden;
 }
 
 ::-webkit-scrollbar-track {
