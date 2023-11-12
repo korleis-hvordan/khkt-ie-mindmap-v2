@@ -2,13 +2,14 @@ import './App.css';
 
 import { useEffect, useRef, useState } from 'react';
 
-import { ActionIcon, Button, Dialog, Group, MantineProvider } from '@mantine/core';
+import { ActionIcon, Box, Button, Center, Dialog, Group, MantineProvider, Stack } from '@mantine/core';
 import { useDidUpdate, useDisclosure } from '@mantine/hooks';
 
 import { IconPlus } from '@tabler/icons-react';
 
 import Canvas from './components/Canvas';
 import Node from './components/Node';
+import NodeM from './components/NodeM'
 import Editor from './components/Editor';
 
 function App() {
@@ -118,10 +119,25 @@ function App() {
         useCustom={useCustom} setUc={setUc}
         action="Publish"
         actionOnClick={() => {
-          console.log(newRef.current.getFile());
           const index = nodeList.length;
           setNl(curr =>
             [...curr,
+              ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) ||
+                (navigator.msMaxTouchPoints > 0) ?
+              <NodeM index={index} pos={{ x: 0, y: 0 }}
+                iColor={newRef.current.getColor()}
+                iSubject={newRef.current.getSubject()}
+                iBody={newRef.current.getBody()}
+                iFile={newRef.current.getFile()}
+                setCn={setCn} setNl={setNl}
+                nodeGraph={nodeGraph} setNg={setNg}
+                connectMode={connectMode} setCm={setCm}
+                setCs={setCs} setCt={setCt}
+                disconnectMode={disconnectMode} setDm={setDm} setDs={setDs}
+                editHandler={editHandler}
+                ref={e => nodeRefs.current[index] = e}
+                key={index}
+              /> :
               <Node index={index} pos={{ x: 0, y: 0 }}
                 iColor={newRef.current.getColor()}
                 iSubject={newRef.current.getSubject()}
@@ -187,4 +203,49 @@ function App() {
 }
 
 export default App;
-// h₂ólyoes ĝʰmónes h₁léwdʰeroes somHóeskʷe gʷr̥Htóteh₂ti h₃r̥ĝtúsukʷe ĝn̥h₁yóntor. éybʰos dh₃tóy ménos k̂ḗrkʷe h₁stés h₂énteroeykʷe sm̥h₂éleyes bʰréh₂tr̥bʰos swé h₂éĝoyh₁n̥t.
+
+// h₂ólyoes ĝʰmónes h₁léwdʰeroes somHóeskʷe gʷr̥Htóteh₂ti h₃r̥ĝtúsukʷe ĝn̥h₁yóntor. éybʰos dh₃tóy
+// ménos k̂ḗrkʷe h₁stés h₂énteroeykʷe sm̥h₂éleyes bʰréh₂tr̥bʰos swé h₂éĝoyh₁n̥t.
+
+// [i] mis
+// [iː] mile
+// [e̝] list
+// [ɛ̝] brist
+// [e̝ː] mele
+// [ɛ̝ː] grene, kræse
+// [e] læst
+// [ɛ] bær
+// [a] række
+// [ɑ̈] kræft
+// [eː] mæle, bære
+// [æː] græde
+// [æ] malle
+// [ɑ̈] takke, var
+// [ɑ̈ː] arne, trane, har
+// [ɛː] male
+// [y] lyt
+// [yː] kyle
+// [ø] kys
+// [œ̝] grynt, høns, høne
+// [ɶ̝] drøv, grøn
+// [ɒ̽] tøj, måtte, fatter, ture, turer
+// [øː] køle
+// [œ̝ː] røbe
+// [œ] gør
+// [œː] gøre
+// [u] guld, brusk
+// [uː] mule, ruse
+// [o̝] sort
+// [ɔ̽] ost
+// [o̝ː] mole
+// [ɒ̝] vor
+// [ɒ̝ː] morse, tårne
+// [ɔ̽ː] måle
+// [ə] måle
+// [ɪ] veje, jage
+// [ʊ] have
+// [ɹ̻̩ˠ] måned, bade
+// [l̩] gammel, tale
+// [n̩] håne, hesten
+// [m̩] hoppen
+// [ŋ̍] pakken
