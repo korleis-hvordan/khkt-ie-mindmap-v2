@@ -52,7 +52,7 @@ const Editor = forwardRef(({ iColor, iSubject, iBody, iFile, colors, setColors, 
   }, [doAction]);
 
   return (
-    <Modal opened={opened} centered radius="xl"
+    <Modal opened={opened} centered radius="lg"
       withCloseButton={false} padding="md" shadow="xl" lockScroll={false}
       onClose={() => { if (useCustom) { setUc(false); } openHandler.close(); }}
       styles={{
