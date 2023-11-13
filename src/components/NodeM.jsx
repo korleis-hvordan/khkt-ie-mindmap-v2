@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
 import { Text, Paper, Title, Menu, ActionIcon, Group, ThemeIcon, Button, px, useMantineTheme, Image, Stack, Box } from '@mantine/core';
-import { useDidUpdate, useElementSize, useForceUpdate, useInterval, useMergedRef, useMouse, useViewportSize, useWindowScroll } from '@mantine/hooks';
+import { useDidUpdate, useElementSize, useForceUpdate, useInterval, useViewportSize } from '@mantine/hooks';
 
 import { IconDotsVertical, IconEdit, IconLink, IconLinkOff, IconTrash } from '@tabler/icons-react';
 
@@ -58,8 +58,6 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
   const size = useElementSize();
   
   const viewport = useViewportSize();
-
-  const [scroll] = useWindowScroll();
   
   const forceUpdate = useForceUpdate();
   
@@ -116,6 +114,7 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
     
   const amIntervalX = useInterval(() => {
     forceUpdate();
+    console.log("A")
     scrollTo(document.body.scrollWidth, scrollY);
   }, 1);
   const amIntervalY = useInterval(() => {
@@ -201,8 +200,8 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
         setOffset({ x: touch.pageX - initialImp.x, y: touch.pageY - initialImp.y });
       }}
       onTouchEnd={() => {
-        amIntervalX.stop();
-        amIntervalY.stop();
+        setAmX(false);
+        setAmY(false);
         setMove(false);
       }}
     >
