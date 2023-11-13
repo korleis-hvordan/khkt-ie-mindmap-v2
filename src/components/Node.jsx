@@ -74,7 +74,7 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, se
 
   const [width, setWidth] = useState(200);
   const [initialWidth, setIw] = useState(null);
- 
+
   const theme = useMantineTheme();
 
   function getSize() {
@@ -213,12 +213,8 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, se
         setIimp({ x: iMouse.x, y: iMouse.y });
       }}
       onMouseUp={() => {
-        if (autoMoveX) {
-          setAmX(false);
-        }
-        if (autoMoveY) {
-          setAmY(false);
-        }
+        setAmX(false);
+        setAmY(false);
         setMove(false);
         setOffset({
           x: Math.max(mouse.x - initialImp.x + scrollX, 0),

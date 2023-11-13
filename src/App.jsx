@@ -1,9 +1,9 @@
 import './App.css';
 
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 
-import { ActionIcon, Box, Button, Center, Dialog, Group, MantineProvider, Stack } from '@mantine/core';
-import { useDidUpdate, useDisclosure } from '@mantine/hooks';
+import { ActionIcon, Button, Dialog, Drawer, Group, MantineProvider, Select, Text, Title } from '@mantine/core';
+import { useDidUpdate, useDisclosure, useViewportSize } from '@mantine/hooks';
 
 import { IconPlus } from '@tabler/icons-react';
 
@@ -11,6 +11,7 @@ import Canvas from './components/Canvas';
 import Node from './components/Node';
 import NodeM from './components/NodeM'
 import Editor from './components/Editor';
+import { IconSettings } from '@tabler/icons-react';
 
 function App() {
   const nodeRefs = useRef([]);
@@ -27,6 +28,11 @@ function App() {
   const [connectMode, setCm] = useState(false);
   const [connectSource, setCs] = useState(null);
   const [connectTarget, setCt] = useState(null);
+
+  const [settingsOpened, { close, open }] = useDisclosure(false);
+  const [currFont, setCf] = useState('Montserrat');
+
+  const viewport = useViewportSize();
 
   useDidUpdate(() => {
     nodeRefs.current.forEach(e => e?.setConnect(connectMode));
@@ -89,7 +95,7 @@ function App() {
   return (
     <MantineProvider
       theme={{
-        fontFamily: 'Indie Flower'
+        fontFamily: currFont
       }}
     >
       <Canvas nodeList={nodeList} nodeGraph={nodeGraph} setNg={setNg}
@@ -97,6 +103,53 @@ function App() {
         disconnectMode={disconnectMode} setDm={setDm}
         disconnectSource={disconnectSource}
       />
+      <Drawer.Root opened={settingsOpened} onClose={close} title="Settings">
+        <Drawer.Overlay />
+        <Drawer.Content>
+          <Drawer.Header>
+            <Drawer.Title><Text fz="xl">Settings</Text></Drawer.Title>
+            <Drawer.CloseButton />
+          </Drawer.Header>
+          <Drawer.Body>
+            <Title order={4}>Appearance</Title>
+            <Select w="50%" radius="xl"
+              label="Font"
+              itemComponent={forwardRef(({ value, ...others }, ref) => (
+                <Text ref={ref} {...others} ff={value}>
+                  {value}
+                </Text>
+              ))}
+              data={['Montserrat', 'Roboto', 'Indie Flower']}
+              onChange={setCf}
+              value={currFont}
+              transitionProps={{ transition: 'pop-bottom-left', duration: 80, timingFunction: 'ease' }}
+              styles={theme => ({
+                dropdown: {
+                  borderRadius: theme.radius.lg,
+                },
+                item: {
+                  fontSize: theme.fontSizes.lg,
+                  '&[data-selected]': {
+                    '&, &:hover': {
+                      color: 'black',
+                      backgroundColor: theme.colors.teal[2]
+                    }
+                  }
+                },
+                input: {
+                  fontSize: theme.fontSizes.lg
+                }
+              })}
+            />
+          </Drawer.Body>
+        </Drawer.Content>
+      </Drawer.Root>
+      <ActionIcon size={50} variant="filled"
+        pos="fixed" top={15} left={15}
+        onClick={open}
+      >
+        <IconSettings size={40} />
+      </ActionIcon>
       <ActionIcon variant="filled" radius="xl" size={60} color="red.7"
         pos="fixed" bottom={40} right={60}
         onClick={newHandler.open}
@@ -123,7 +176,7 @@ function App() {
           setNl(curr =>
             [...curr,
               window.ontouchstart !== undefined ?
-              <NodeM index={index} pos={{ x: 0, y: 0 }}
+              <NodeM index={index} pos={{ x: viewport.width / 2, y: viewport.height / 2 }}
                 iColor={newRef.current.getColor()}
                 iSubject={newRef.current.getSubject()}
                 iBody={newRef.current.getBody()}
@@ -137,7 +190,8 @@ function App() {
                 ref={e => nodeRefs.current[index] = e}
                 key={index}
               /> :
-              <Node index={index} pos={{ x: 0, y: 0 }}
+              <Node index={index}
+                pos={{ x: viewport.width / 2 + scrollX, y: viewport.height / 2 + scrollY}}
                 iColor={newRef.current.getColor()}
                 iSubject={newRef.current.getSubject()}
                 iBody={newRef.current.getBody()}
