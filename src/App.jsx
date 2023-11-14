@@ -42,8 +42,7 @@ function App() {
 
   useEffect(() => {
     const backgrounds = [bg1, bg2, bg3];
-    setBg(backgrounds[Math.floor(Math.random() * 3)]);
-    console.log(bg2)
+    fetch(backgrounds[Math.floor(Math.random() * 3)]).then(res => res.blob()).then(bg => setBg(bg));
   }, []);
 
   useDidUpdate(() => {
@@ -159,7 +158,7 @@ function App() {
               <Divider size="md" my="sm" />
               <Group position="apart" pos="relative">
                 <Text>Background</Text>
-                <Image maw={250} src={background} />
+                <Image maw={250} src={background ? URL.createObjectURL(background) : ''} />
                 <FileButton pos="absolute" w="100%" h="100%" variant="outline"
                   styles={{
                     root: {

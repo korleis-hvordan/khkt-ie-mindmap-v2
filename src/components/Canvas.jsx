@@ -167,15 +167,15 @@ export default function Canvas({ background, nodeList, nodeGraph, setNg, nodeRef
     setDg(graph);
   }, [disconnectSource, nodeGraph]);
 
-  // const [bg, setBg] = useState(null);
+  const [bg, setBg] = useState(null);
 
-  // useDidUpdate(() => {
-  //   setBg(background ? URL.createObjectURL(background) : '');
-  // }, [background])
+  useDidUpdate(() => {
+    setBg(background ? URL.createObjectURL(background) : '');
+  }, [background])
 
   return (
     <Box pos="relative">
-      <BackgroundImage h="100%" pos="fixed" src={background} />
+      <BackgroundImage h="100%" pos="fixed" src={bg} />
       <canvas width={viewport.width} height={viewport.height} ref={canvasRef}
         style={{ position: 'fixed' }}
       />
