@@ -2,7 +2,7 @@ import './App.css';
 
 import { forwardRef, useEffect, useRef, useState } from 'react';
 
-import { ActionIcon, Button, Dialog, Drawer, Group, MantineProvider, Select, Text, Title } from '@mantine/core';
+import { ActionIcon, Button, Dialog, Divider, Drawer, FileButton, Group, Image, MantineProvider, Paper, Select, Text, Title } from '@mantine/core';
 import { useDidUpdate, useDisclosure, useViewportSize } from '@mantine/hooks';
 
 import { IconPlus } from '@tabler/icons-react';
@@ -33,6 +33,15 @@ function App() {
   const [currFont, setCf] = useState('Montserrat');
 
   const viewport = useViewportSize();
+
+  const [background, setBg] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      fetch(`https://cors-anywhere.herokuapp.com/https://picsum.photos/${viewport.width}/${viewport.height}`)
+      .then(res => res.blob()).then(bg => setBg(bg));
+    })();
+  }, []);
 
   useDidUpdate(() => {
     nodeRefs.current.forEach(e => e?.setConnect(connectMode));
@@ -98,7 +107,7 @@ function App() {
         fontFamily: currFont
       }}
     >
-      <Canvas nodeList={nodeList} nodeGraph={nodeGraph} setNg={setNg}
+      <Canvas background={background} nodeList={nodeList} nodeGraph={nodeGraph} setNg={setNg}
         nodeRefs={nodeRefs} currNode={currNode}
         disconnectMode={disconnectMode} setDm={setDm}
         disconnectSource={disconnectSource}
@@ -112,35 +121,54 @@ function App() {
           </Drawer.Header>
           <Drawer.Body>
             <Title order={4}>Appearance</Title>
-            <Select w="50%" radius="xl"
-              label="Font"
-              itemComponent={forwardRef(({ value, ...others }, ref) => (
-                <Text ref={ref} {...others} ff={value}>
-                  {value}
-                </Text>
-              ))}
-              data={['Montserrat', 'Roboto', 'Indie Flower']}
-              onChange={setCf}
-              value={currFont}
-              transitionProps={{ transition: 'pop-bottom-left', duration: 80, timingFunction: 'ease' }}
-              styles={theme => ({
-                dropdown: {
-                  borderRadius: theme.radius.lg,
-                },
-                item: {
-                  fontSize: theme.fontSizes.lg,
-                  '&[data-selected]': {
-                    '&, &:hover': {
-                      color: 'black',
-                      backgroundColor: theme.colors.teal[2]
+            <Paper radius="lg" bg="gainsboro" my="md" p="md">
+              <Group position="apart">
+                <Text>Font</Text>
+                <Select w="50%" radius="xl"
+                  itemComponent={forwardRef(({ value, ...others }, ref) => (
+                    <Text ref={ref} {...others} ff={value}>
+                      {value}
+                    </Text>
+                  ))}
+                  data={['Montserrat', 'Roboto', 'Indie Flower']}
+                  onChange={setCf}
+                  value={currFont}
+                  transitionProps={{ transition: 'pop-bottom-left', duration: 80, timingFunction: 'ease' }}
+                  styles={theme => ({
+                    dropdown: {
+                      borderRadius: theme.radius.lg,
+                    },
+                    item: {
+                      fontSize: theme.fontSizes.lg,
+                      '&[data-selected]': {
+                        '&, &:hover': {
+                          color: 'black',
+                          backgroundColor: theme.colors.teal[2]
+                        }
+                      }
+                    },
+                    input: {
+                      fontSize: theme.fontSizes.lg
                     }
-                  }
-                },
-                input: {
-                  fontSize: theme.fontSizes.lg
-                }
-              })}
-            />
+                  })}
+                />
+              </Group>
+              <Divider size="md" my="sm" />
+              <Group position="apart" pos="relative">
+                <Text>Background</Text>
+                <Image maw={250} src={background ? URL.createObjectURL(background) : ''} />
+                <FileButton pos="absolute" w="100%" h="100%" variant="outline"
+                  styles={{
+                    root: {
+                      border: 'none'
+                    }
+                  }}
+                  onChange={setBg}
+                >
+                  {props => <Button {...props} />}
+                </FileButton>
+              </Group>
+            </Paper>
           </Drawer.Body>
         </Drawer.Content>
       </Drawer.Root>

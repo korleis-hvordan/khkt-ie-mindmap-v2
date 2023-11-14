@@ -87,7 +87,7 @@ function drawCurve(ctx, curve, offset) {
   ctx.closePath();
 }
 
-export default function Canvas({ nodeList, nodeGraph, setNg, nodeRefs, currNode, disconnectMode, setDm, disconnectSource }) {
+export default function Canvas({ background, nodeList, nodeGraph, setNg, nodeRefs, currNode, disconnectMode, setDm, disconnectSource }) {
   const viewport = useViewportSize();
 
   const [scroll] = useWindowScroll();
@@ -167,11 +167,15 @@ export default function Canvas({ nodeList, nodeGraph, setNg, nodeRefs, currNode,
     setDg(graph);
   }, [disconnectSource, nodeGraph]);
 
+  const [bg, setBg] = useState(null);
+
+  useDidUpdate(() => {
+    setBg(background ? URL.createObjectURL(background) : '');
+  }, [background])
+
   return (
     <Box pos="relative">
-      <BackgroundImage h="100%" pos="fixed"
-        src={`https://picsum.photos/${viewport.width}/${viewport.height}`}
-      />
+      <BackgroundImage h="100%" pos="fixed" src={bg} />
       <canvas width={viewport.width} height={viewport.height} ref={canvasRef}
         style={{ position: 'fixed' }}
       />
