@@ -13,6 +13,10 @@ import NodeM from './components/NodeM'
 import Editor from './components/Editor';
 import { IconSettings } from '@tabler/icons-react';
 
+import bg1 from './assets/1.jpg';
+import bg2 from './assets/2.jpg';
+import bg3 from './assets/3.jpg';
+
 function App() {
   const nodeRefs = useRef([]);
   const [nodeList, setNl] = useState([]);
@@ -37,8 +41,9 @@ function App() {
   const [background, setBg] = useState(null);
 
   useEffect(() => {
-    fetch(`/src/assets/${Math.floor(Math.random() * 3) + 1}.jpg`)
-    .then(res => res.blob()).then(bg => setBg(bg));
+    const backgrounds = [bg1, bg2, bg3];
+    setBg(backgrounds[Math.floor(Math.random() * 3)]);
+    console.log(bg2)
   }, []);
 
   useDidUpdate(() => {
@@ -154,7 +159,7 @@ function App() {
               <Divider size="md" my="sm" />
               <Group position="apart" pos="relative">
                 <Text>Background</Text>
-                <Image maw={250} src={background ? URL.createObjectURL(background) : ''} />
+                <Image maw={250} src={background} />
                 <FileButton pos="absolute" w="100%" h="100%" variant="outline"
                   styles={{
                     root: {
