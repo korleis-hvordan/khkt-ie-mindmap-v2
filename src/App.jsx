@@ -37,10 +37,8 @@ function App() {
   const [background, setBg] = useState(null);
 
   useEffect(() => {
-    (async () => {
-      fetch(`https://cors-anywhere.herokuapp.com/https://picsum.photos/${viewport.width}/${viewport.height}`)
-      .then(res => res.blob()).then(bg => setBg(bg));
-    })();
+    fetch(`/src/assets/${Math.floor(Math.random() * 3) + 1}.jpg`)
+    .then(res => res.blob()).then(bg => setBg(bg));
   }, []);
 
   useDidUpdate(() => {
