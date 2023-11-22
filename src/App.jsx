@@ -2,7 +2,7 @@ import './App.css';
 
 import { forwardRef, useEffect, useRef, useState } from 'react';
 
-import { ActionIcon, Button, Dialog, Divider, Drawer, FileButton, Group, Image, MantineProvider, Paper, Select, Text, Title } from '@mantine/core';
+import { ActionIcon, AppShell, Box, Button, Center, Dialog, Divider, Drawer, FileButton, Group, Header, Image, MantineProvider, Navbar, Paper, Select, Stack, Text, Title } from '@mantine/core';
 import { useDidUpdate, useDisclosure, useViewportSize } from '@mantine/hooks';
 
 import { IconPlus } from '@tabler/icons-react';
@@ -103,184 +103,213 @@ function App() {
   });
   }, []);
 
+  useDidUpdate(() => {
+    console.log(nodeGraph)
+  }, [nodeGraph]);
+
   return (
     <MantineProvider
       theme={{
         fontFamily: currFont
       }}
     >
-      <Canvas background={background} nodeList={nodeList} nodeGraph={nodeGraph} setNg={setNg}
-        nodeRefs={nodeRefs} currNode={currNode}
-        disconnectMode={disconnectMode} setDm={setDm}
-        disconnectSource={disconnectSource}
-      />
-      <Drawer.Root opened={settingsOpened} onClose={close} title="Settings">
-        <Drawer.Overlay />
-        <Drawer.Content>
-          <Drawer.Header>
-            <Drawer.Title><Text fz="xl">Settings</Text></Drawer.Title>
-            <Drawer.CloseButton />
-          </Drawer.Header>
-          <Drawer.Body>
-            <Title order={4}>Appearance</Title>
-            <Paper radius="lg" bg="gainsboro" my="md" p="md">
-              <Group position="apart">
-                <Text>Font</Text>
-                <Select w="50%" radius="xl"
-                  itemComponent={forwardRef(({ value, ...others }, ref) => (
-                    <Text ref={ref} {...others} ff={value}>
-                      {value}
-                    </Text>
-                  ))}
-                  data={['Montserrat', 'Roboto', 'Indie Flower']}
-                  onChange={setCf}
-                  value={currFont}
-                  transitionProps={{ transition: 'pop-bottom-left', duration: 80, timingFunction: 'ease' }}
-                  styles={theme => ({
-                    dropdown: {
-                      borderRadius: theme.radius.lg,
-                    },
-                    item: {
-                      fontSize: theme.fontSizes.lg,
-                      '&[data-selected]': {
-                        '&, &:hover': {
-                          color: 'black',
-                          backgroundColor: theme.colors.teal[2]
+      <AppShell
+        padding={0}
+        navbar={
+          <Navbar width={{ base: 250 }} p="xs">
+            <Stack w="100%" h="100%" justify="space-around">
+              <Paper h="25%" shadow="xl" radius="xl" bg="gray.0"
+                sx={{ '&:hover': { outline: '2px solid darkgray' } }}
+              >
+                <Center h="100%" fz="1.5rem">Study Guide</Center>
+              </Paper>
+              <Paper h="25%" shadow="xl" radius="xl" bg="gray.0"
+                sx={{ '&:hover': { outline: '2px solid darkgray' } }}
+              >
+                <Center h="100%" fz="1.5rem">Questions</Center>
+              </Paper>
+              <Paper h="25%" shadow="xl" radius="xl" bg="gray.0"
+                sx={{ '&:hover': { outline: '2px solid darkgray' } }}
+              >
+                <Center h="100%" fz="1.5rem">Mindmap</Center>
+              </Paper>
+            </Stack>
+          </Navbar>
+        }
+      >
+        <Canvas background={background} nodeList={nodeList} nodeGraph={nodeGraph} setNg={setNg}
+          nodeRefs={nodeRefs} currNode={currNode}
+          disconnectMode={disconnectMode} setDm={setDm}
+          disconnectSource={disconnectSource}
+        />
+        <Drawer.Root opened={settingsOpened} onClose={close} title="Settings" position="right">
+          <Drawer.Overlay />
+          <Drawer.Content>
+            <Drawer.Header>
+              <Drawer.Title><Text fz="xl">Settings</Text></Drawer.Title>
+              <Drawer.CloseButton />
+            </Drawer.Header>
+            <Drawer.Body>
+              <Title order={4}>Appearance</Title>
+              <Paper radius="lg" bg="gainsboro" my="md" p="md">
+                <Group position="apart">
+                  <Text>Font</Text>
+                  <Select w="50%" radius="xl"
+                    itemComponent={forwardRef(({ value, ...others }, ref) => (
+                      <Text ref={ref} {...others} ff={value}>
+                        {value}
+                      </Text>
+                    ))}
+                    data={['Montserrat', 'Roboto', 'Indie Flower']}
+                    onChange={setCf}
+                    value={currFont}
+                    transitionProps={{ transition: 'pop-bottom-left', duration: 80, timingFunction: 'ease' }}
+                    styles={theme => ({
+                      dropdown: {
+                        borderRadius: theme.radius.lg,
+                      },
+                      item: {
+                        fontSize: theme.fontSizes.lg,
+                        '&[data-selected]': {
+                          '&, &:hover': {
+                            color: 'black',
+                            backgroundColor: theme.colors.teal[2]
+                          }
                         }
+                      },
+                      input: {
+                        fontSize: theme.fontSizes.lg
                       }
-                    },
-                    input: {
-                      fontSize: theme.fontSizes.lg
-                    }
-                  })}
+                    })}
+                  />
+                </Group>
+                <Divider size="md" my="sm" />
+                <Group position="apart" pos="relative">
+                  <Text>Background</Text>
+                  <Image maw={250} src={background ? URL.createObjectURL(background) : ''} />
+                  <FileButton pos="absolute" w="100%" h="100%" variant="outline"
+                    styles={{
+                      root: {
+                        border: 'none'
+                      }
+                    }}
+                    onChange={setBg}
+                  >
+                    {props => <Button {...props} />}
+                  </FileButton>
+                </Group>
+              </Paper>
+            </Drawer.Body>
+          </Drawer.Content>
+        </Drawer.Root>
+        <ActionIcon size={50} variant="filled"
+          pos="fixed" top={15} right={15}
+          onClick={open}
+        >
+          <IconSettings size={40} />
+        </ActionIcon>
+        <ActionIcon variant="filled" radius="xl" size={60} color="red.7"
+          pos="fixed" bottom={40} right={60}
+          onClick={newHandler.open}
+          sx={{
+            zIndex: 1,
+            transition: '250ms ease',
+            '&:hover': {
+              rotate: '45deg',
+              transition: '250ms ease'
+            }
+          }}
+        >
+          <IconPlus size={32} />
+        </ActionIcon>
+        <Editor
+          ref={newRef} opened={newOpened} openHandler={newHandler}
+          iColor="Red" iSubject="" iBody="" iFile={null}
+          colors={colors} setColors={setColors}
+          customColor={customColor} setCc={setCc}
+          useCustom={useCustom} setUc={setUc}
+          action="Publish"
+          actionOnClick={() => {
+            const index = nodeList.length;
+            setNl(curr =>
+              [...curr,
+                window.ontouchstart !== undefined ?
+                <NodeM index={index} pos={{ x: (viewport.width - 250)  / 2, y: viewport.height / 2 }}
+                  iColor={newRef.current.getColor()}
+                  iSubject={newRef.current.getSubject()}
+                  iBody={newRef.current.getBody()}
+                  iFile={newRef.current.getFile()}
+                  setCn={setCn} setNl={setNl}
+                  nodeGraph={nodeGraph} setNg={setNg}
+                  connectMode={connectMode} setCm={setCm}
+                  setCs={setCs} setCt={setCt}
+                  disconnectMode={disconnectMode} setDm={setDm} setDs={setDs}
+                  editHandler={editHandler}
+                  ref={e => nodeRefs.current[index] = e}
+                  key={index}
+                /> :
+                <Node index={index}
+                  pos={{ x: (viewport.width - 250) / 2 + scrollX, y: viewport.height / 2 + scrollY}}
+                  iColor={newRef.current.getColor()}
+                  iSubject={newRef.current.getSubject()}
+                  iBody={newRef.current.getBody()}
+                  iFile={newRef.current.getFile()}
+                  setCn={setCn} setNl={setNl}
+                  nodeGraph={nodeGraph} setNg={setNg}
+                  connectMode={connectMode} setCm={setCm}
+                  setCs={setCs} setCt={setCt}
+                  disconnectMode={disconnectMode} setDm={setDm} setDs={setDs}
+                  editHandler={editHandler}
+                  ref={e => nodeRefs.current[index] = e}
+                  key={index}
                 />
-              </Group>
-              <Divider size="md" my="sm" />
-              <Group position="apart" pos="relative">
-                <Text>Background</Text>
-                <Image maw={250} src={background ? URL.createObjectURL(background) : ''} />
-                <FileButton pos="absolute" w="100%" h="100%" variant="outline"
-                  styles={{
-                    root: {
-                      border: 'none'
-                    }
-                  }}
-                  onChange={setBg}
-                >
-                  {props => <Button {...props} />}
-                </FileButton>
-              </Group>
-            </Paper>
-          </Drawer.Body>
-        </Drawer.Content>
-      </Drawer.Root>
-      <ActionIcon size={50} variant="filled"
-        pos="fixed" top={15} left={15}
-        onClick={open}
-      >
-        <IconSettings size={40} />
-      </ActionIcon>
-      <ActionIcon variant="filled" radius="xl" size={60} color="red.7"
-        pos="fixed" bottom={40} right={60}
-        onClick={newHandler.open}
-        sx={{
-          zIndex: 1,
-          transition: '250ms ease',
-          '&:hover': {
-            rotate: '45deg',
-            transition: '250ms ease'
-          }
-        }}
-      >
-        <IconPlus size={32} />
-      </ActionIcon>
-      <Editor
-        ref={newRef} opened={newOpened} openHandler={newHandler}
-        iColor="Red" iSubject="" iBody="" iFile={null}
-        colors={colors} setColors={setColors}
-        customColor={customColor} setCc={setCc}
-        useCustom={useCustom} setUc={setUc}
-        action="Publish"
-        actionOnClick={() => {
-          const index = nodeList.length;
-          setNl(curr =>
-            [...curr,
-              window.ontouchstart !== undefined ?
-              <NodeM index={index} pos={{ x: viewport.width / 2, y: viewport.height / 2 }}
-                iColor={newRef.current.getColor()}
-                iSubject={newRef.current.getSubject()}
-                iBody={newRef.current.getBody()}
-                iFile={newRef.current.getFile()}
-                setCn={setCn} setNl={setNl}
-                nodeGraph={nodeGraph} setNg={setNg}
-                connectMode={connectMode} setCm={setCm}
-                setCs={setCs} setCt={setCt}
-                disconnectMode={disconnectMode} setDm={setDm} setDs={setDs}
-                editHandler={editHandler}
-                ref={e => nodeRefs.current[index] = e}
-                key={index}
-              /> :
-              <Node index={index}
-                pos={{ x: viewport.width / 2 + scrollX, y: viewport.height / 2 + scrollY}}
-                iColor={newRef.current.getColor()}
-                iSubject={newRef.current.getSubject()}
-                iBody={newRef.current.getBody()}
-                iFile={newRef.current.getFile()}
-                setCn={setCn} setNl={setNl}
-                nodeGraph={nodeGraph} setNg={setNg}
-                connectMode={connectMode} setCm={setCm}
-                setCs={setCs} setCt={setCt}
-                disconnectMode={disconnectMode} setDm={setDm} setDs={setDs}
-                editHandler={editHandler}
-                ref={e => nodeRefs.current[index] = e}
-                key={index}
-              />
-            ]
-          );
+              ]
+            );
 
-          newRef.current.setSubject('');
-          newRef.current.setBody('');
-          newRef.current.setFile(null);
-          newHandler.close();
-        }}
-      />
-      <Editor ref={editRef}
-        iColor={nodeRefs.current[currNode?.index]?.getColor() ?? "Red"}
-        iSubject={nodeRefs.current[currNode?.index]?.getSubject() ?? ""}
-        iBody={nodeRefs.current[currNode?.index]?.getBody() ?? ""}
-        iFile={nodeRefs.current[currNode?.index]?.getFile() ?? null}
-        key={currNode?.index} // ao ma vcl
-        colors={colors} setColors={setColors}
-        customColor={customColor} setCc={setCc}
-        useCustom={useCustom} setUc={setUc}
-        opened={editOpened} openHandler={editHandler}
-        action="Update"
-        actionOnClick={() => {
-          const currRef = nodeRefs.current[currNode?.index];
-          currRef.setColor(editRef.current.getColor());
-          currRef.setSubject(editRef.current.getSubject());
-          currRef.setBody(editRef.current.getBody());
-          currRef.setFile(editRef.current.getFile());
+            newRef.current.setSubject('');
+            newRef.current.setBody('');
+            newRef.current.setFile(null);
+            newHandler.close();
+          }}
+        />
+        <Editor ref={editRef}
+          iColor={nodeRefs.current[currNode?.index]?.getColor() ?? "Red"}
+          iSubject={nodeRefs.current[currNode?.index]?.getSubject() ?? ""}
+          iBody={nodeRefs.current[currNode?.index]?.getBody() ?? ""}
+          iFile={nodeRefs.current[currNode?.index]?.getFile() ?? null}
+          key={currNode?.index} // ao ma vcl
+          colors={colors} setColors={setColors}
+          customColor={customColor} setCc={setCc}
+          useCustom={useCustom} setUc={setUc}
+          opened={editOpened} openHandler={editHandler}
+          action="Update"
+          actionOnClick={() => {
+            const currRef = nodeRefs.current[currNode?.index];
+            currRef.setColor(editRef.current.getColor());
+            currRef.setSubject(editRef.current.getSubject());
+            currRef.setBody(editRef.current.getBody());
+            currRef.setFile(editRef.current.getFile());
 
-          editHandler.close();
-        }}
-      />
-      <Dialog opened={connectMode} radius="lg" py="xs" fz="xl" w="fit-content"
-        position={{ bottom: 20, left: 20 }}
-      >
-        <Group>
-          Pick a post to connect to
-          <Button fz="xl" onClick={() => setCm(false)}>Cancel</Button>
-        </Group>
-      </Dialog>
-      <Dialog opened={disconnectMode} radius="lg" py="xs" fz="xl" w="fit-content"
-        position={{ bottom: 20, left: 20 }}
-      >
-        <Group>
-          Pick a post to disconnect from
-          <Button fz="xl" onClick={() => setDm(false)}>Cancel</Button>
-        </Group>
-      </Dialog>
+            editHandler.close();
+          }}
+        />
+        <Dialog opened={connectMode} radius="lg" py="xs" fz="xl" w="fit-content"
+          position={{ bottom: 20, right: 20 }}
+        >
+          <Group>
+            Pick a post to connect to
+            <Button fz="xl" onClick={() => setCm(false)}>Cancel</Button>
+          </Group>
+        </Dialog>
+        <Dialog opened={disconnectMode} radius="lg" py="xs" fz="xl" w="fit-content"
+          position={{ bottom: 20, right: 20 }}
+        >
+          <Group>
+            Pick a post to disconnect from
+            <Button fz="xl" onClick={() => setDm(false)}>Cancel</Button>
+          </Group>
+        </Dialog>
+      </AppShell>
     </MantineProvider>
   );
 }

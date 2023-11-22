@@ -98,7 +98,7 @@ export default function Canvas({ background, nodeList, nodeGraph, setNg, nodeRef
     const ctx = canvasRef.current.getContext("2d");
     ctx.strokeStyle = "lightgray";
     ctx.lineWidth = 3;
-    ctx.clearRect(0, 0, viewport.width, viewport.height);
+    ctx.clearRect(0, 0, viewport.width - 300, viewport.height);
 
     nodeGraph.forEach((e, i) => {
       e?.forEach(ele => {
@@ -176,7 +176,7 @@ export default function Canvas({ background, nodeList, nodeGraph, setNg, nodeRef
   return (
     <Box pos="relative">
       <BackgroundImage h="100%" pos="fixed" src={bg} />
-      <canvas width={viewport.width} height={viewport.height} ref={canvasRef}
+      <canvas width={viewport.width - 250} height={viewport.height} ref={canvasRef}
         style={{ position: 'fixed' }}
       />
       {nodeList}

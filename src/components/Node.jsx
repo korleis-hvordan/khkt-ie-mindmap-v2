@@ -102,7 +102,7 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, se
     }
 
     setOffset({
-      x: Math.max(mouse.x - initialImp.x + scrollX, 0),
+      x: Math.max(mouse.x - 250 - initialImp.x + scrollX, 0),
       y: Math.max(mouse.y - initialImp.y + scrollY, 0)
     });
   }, [mouse.x, mouse.y, scroll]);
@@ -115,7 +115,7 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, se
       return;
     }
         
-    if (mouse.x > viewport.width - 100) {
+    if (mouse.x > viewport.width - 100 - 250) {
       if (!autoMoveX) {
         setAmX(true);
       }
@@ -194,7 +194,7 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, se
     <Paper radius="lg" shadow="xl" bg={lColor} pos="absolute" miw={100} w={width}
       py="xs" px="md"
       ref={mergedRef}
-      left={Math.max(move ? mouse.x - initialImp.x + scrollX : offset.x, 0)}
+      left={Math.max(move ? mouse.x - 250 - initialImp.x + scrollX : offset.x, 0)}
       top={Math.max(move ? mouse.y - initialImp.y + scrollY : offset.y, 0)}
       sx={theme => ({
         ...(move && { zIndex: 1 }),
@@ -217,7 +217,7 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, se
         setAmY(false);
         setMove(false);
         setOffset({
-          x: Math.max(mouse.x - initialImp.x + scrollX, 0),
+          x: Math.max(mouse.x - 250 - initialImp.x + scrollX, 0),
           y: Math.max(mouse.y - initialImp.y + scrollY, 0)
         });
       }}
