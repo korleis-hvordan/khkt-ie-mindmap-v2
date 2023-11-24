@@ -98,7 +98,7 @@ export default function Canvas({ background, nodeList, nodeGraph, setNg, nodeRef
     const ctx = canvasRef.current.getContext("2d");
     ctx.strokeStyle = "lightgray";
     ctx.lineWidth = 3;
-    ctx.clearRect(0, 0, viewport.width - 300, viewport.height);
+    ctx.clearRect(0, 0, viewport.width - 250, viewport.height);
 
     nodeGraph.forEach((e, i) => {
       e?.forEach(ele => {
@@ -169,9 +169,9 @@ export default function Canvas({ background, nodeList, nodeGraph, setNg, nodeRef
 
   const [bg, setBg] = useState(null);
 
-  useDidUpdate(() => {
+  useEffect(() => {
     setBg(background ? URL.createObjectURL(background) : '');
-  }, [background])
+  }, [background]);
 
   return (
     <Box pos="relative">
