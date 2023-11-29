@@ -36,11 +36,31 @@ function getTextColor(bgColor, light, dark) {
   return whiteContrast > blackContrast ? light : dark;
 }
 
-const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, setNl, setNg, connectMode, setCm, setCs, setCt, disconnectMode, setDm, setDs, editHandler }, ref) => {
+const dataToBlob = async (imageData) => {
+  if (imageData === null) {
+    return null;
+  }
+  return await (await fetch(imageData)).blob();
+};
+
+const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, iWidth, setCn, setNl, setNg, connectMode, setCm, setCs, setCt, disconnectMode, setDm, setDs, editHandler }, ref) => {
   const [color, setColor] = useState(iColor);
   const [subject, setSubject] = useState(iSubject);
   const [body, setBody] = useState(iBody);
   const [file, setFile] = useState(iFile);
+
+  const [fille, setFille] = useState(null);
+
+  useEffect(() => {(async () => {
+    let f;
+    if (typeof file == 'string') {
+      f = await dataToBlob(file);
+    }
+    else {
+      f = file;
+    }
+    setFille(f ? URL.createObjectURL(f) : '');
+  })()}, [file]);
 
   const lColor = color.toLowerCase();
 
@@ -72,7 +92,7 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, se
   const [initialImp, setIimp] = useState();
   const [offset, setOffset] = useState(pos);
 
-  const [width, setWidth] = useState(200);
+  const [width, setWidth] = useState(iWidth);
   const [initialWidth, setIw] = useState(null);
 
   const theme = useMantineTheme();
@@ -285,6 +305,7 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, se
           </Menu.Item>
           <Menu.Divider />
           <Menu.Item fz="lg"
+            disabled={index === 0}
             color="red"
             onMouseDown={e => e.stopPropagation()}
             onMouseUp={e => e.stopPropagation()}
@@ -321,7 +342,7 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, se
       </Menu>}
       <Title order={3}>{subject}</Title>
       {file &&
-        <Image radius="md" src={URL.createObjectURL(file)}
+        <Image radius="md" src={fille}
           mt={5}
           {...(body.trim().length && { mb: 5 })}
           styles={{

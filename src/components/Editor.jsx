@@ -1,15 +1,35 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import { ActionIcon, Button, Center, CloseButton, ColorPicker, FileButton, Group, Image, Modal, Popover, ScrollArea, Select, TextInput, Textarea, ThemeIcon } from '@mantine/core';
 import { useDidUpdate } from '@mantine/hooks';
 
 import { IconColorFilter, IconFileImport, IconTrash, IconX } from '@tabler/icons-react';
 
+const dataToBlob = async (imageData) => {
+  if (imageData === null) {
+    return null;
+  }
+  return await (await fetch(imageData)).blob();
+};
+
 const Editor = forwardRef(({ iColor, iSubject, iBody, iFile, colors, setColors, customColor, setCc, useCustom, setUc, opened, openHandler, action, actionOnClick }, ref) => {
   const [color, setColor] = useState(iColor);
   const [subject, setSubject] = useState(iSubject);
   const [body, setBody] = useState(iBody);
   const [file, setFile] = useState(iFile);
+  
+  const [fille, setFille] = useState(null);
+
+  useEffect(() => {(async () => {
+    let f;
+    if (typeof file == 'string') {
+      f = await dataToBlob(file);
+    }
+    else {
+      f = file;
+    }
+    setFille(f ? URL.createObjectURL(f) : '');
+  })()}, [file]);
 
   const select = useRef(null);
 
@@ -80,7 +100,7 @@ const Editor = forwardRef(({ iColor, iSubject, iBody, iFile, colors, setColors, 
         >{action}</Button>
       </Group>
       <ScrollArea px="md" h="30rem">
-        <TextInput size="2em" variant="unstyled" placeholder="Subject"
+        <TextInput size="2em" variant="unstyled" placeholder="Nội dung"
           value={subject}
           onChange={e => setSubject(e.currentTarget.value)}
         />
@@ -96,9 +116,9 @@ const Editor = forwardRef(({ iColor, iSubject, iBody, iFile, colors, setColors, 
             }
           </FileButton>
         </Center>}
-        {file && <Image my="md" radius="md" src={URL.createObjectURL(file)} />}
+        {file && <Image my="md" radius="md" src={fille} />}
         <Textarea size="lg" variant="unstyled" minRows={8}
-          placeholder="Write something here..."
+          placeholder="Hãy viết gì đó..."
           value={body}
           onChange={e => setBody(e.currentTarget.value)}
         />

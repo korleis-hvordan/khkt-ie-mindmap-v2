@@ -33,3 +33,22 @@ html {
     /* in this case to disable pinch-zoom, set `touch-action: pan-x pan-y;` on `body` instead of `html` */
   }
 }
+
+.preview {
+  border: 2px solid black;
+  box-shadow: 20px 38px 34px -26px hsla(0, 0%, 0%, 0.2);
+  animation: box-alternate 500ms steps(2, jump-none) infinite;
+}
+
+@keyframes box-alternate {
+  from {
+    border-width: 4px 2px 2px 4px;
+    border-radius: 95% 4% 97% 5%/4% 94% 3% 95%;
+    transform: rotate(2deg);
+  }
+  to {
+    border-width: 2px 2px 4px 4px;
+    border-radius: 4% 95% 6% 95%/95% 4% 92% 5%;
+    transform: rotate(-2deg);
+  }
+}
