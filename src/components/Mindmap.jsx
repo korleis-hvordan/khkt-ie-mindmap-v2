@@ -763,7 +763,12 @@ function Mindmap({ currId, setSmm }) {
                       })
                       .then(_ => {
                         more.close();
-                        setQuestions(curr => [...curr, { question: ques, answers: answers }])
+                        setQuestions(curr => [...curr, { question: ques, answers: answers }]);
+                        setQues("");
+                        form.setFieldValue('choice', '');
+                        setCCheck([]);
+                        setChoices([]);
+                        setCurrChoice(null);
                       });
                     }}
                   >Tạo</Button>
