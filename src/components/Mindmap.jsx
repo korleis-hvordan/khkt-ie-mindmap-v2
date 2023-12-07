@@ -1,9 +1,10 @@
 import { forwardRef, useEffect, useRef, useState } from 'react';
 
-import { ActionIcon, AppShell, Box, Button, Center, Dialog, Divider, Drawer, FileButton, Group, Header, Image, Loader, MantineProvider, Modal, Navbar, Paper, ScrollArea, Select, Stack, Text, TextInput, Title } from '@mantine/core';
+import { ActionIcon, AppShell, Box, Button, Center, Checkbox, Dialog, Divider, Drawer, FileButton, Group, Image, List, Loader, MantineProvider, Modal, Navbar, Paper, ScrollArea, Select, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useDidUpdate, useDisclosure, useViewportSize } from '@mantine/hooks';
+import { useForm } from '@mantine/form';
 
-import { IconArrowBackUp, IconCheck, IconDeviceFloppy, IconPlus } from '@tabler/icons-react';
+import { IconArrowBackUp, IconCheck, IconDeviceFloppy, IconPencilPlus, IconPlus, IconTrash, IconX } from '@tabler/icons-react';
 import { IconSettings } from '@tabler/icons-react';
 
 import Canvas from './Canvas';
@@ -175,7 +176,7 @@ function Mindmap({ currId, setSmm }) {
             }
           }
 
-          dfs(null, json.mindMap.content.main);
+          dfs(null, json.mindMap.content.main.root);
 
           for (const x of json.mindMap.content.other) {
             dfs(null, x);
@@ -186,6 +187,8 @@ function Mindmap({ currId, setSmm }) {
 
           setBg(await dataToBlob(json.mindMap.content.background));
           setCf(json.mindMap.content.font);
+
+          setQuestions(json.question.content);
         }
         setTitle(json.title);
       });
@@ -287,7 +290,7 @@ function Mindmap({ currId, setSmm }) {
         return;
       }
 
-      let prev = source === 0 ? json.content.main.children
+      let prev = source === 0 ? json.content.main.root.children
         : json.content.other[json.content.other.findIndex(e => e.index === source)].children;
       if (v !== source) {
         for (let i = 0; i < cock.length; i++) {
@@ -387,9 +390,37 @@ function Mindmap({ currId, setSmm }) {
 
   const [load, setLoad] = useState(false);
 
-  const [opened, { openc, closec }] = useDisclosure(false);
+  const [checkOpened, check] = useDisclosure(false);
 
-  const [l, setL] = useState(false);
+  const [questions, setQuestions] = useState([]);
+
+  const [moreOpened, more] = useDisclosure(false);
+
+  const [ques, setQues] = useState("");
+  const form = useForm({
+    initialValues: {
+      choice: ''
+    },
+    validate: {
+      choice: value => value.length ? null : "Không thể bỏ trống!"
+    }
+  });
+  const [choices, setChoices] = useState([]);
+  const [cCheck, setCCheck] = useState([]);
+  const [currChoice, setCurrChoice] = useState(null);
+
+  useDidUpdate(() => {
+    setCCheck(curr => {
+      const copy = curr.slice();
+      for (let i = 0; i < copy.length; i++) {
+        if (i !== currChoice) {
+          copy[i] = false;
+        }
+      }
+      return copy;
+    });
+  }, [currChoice]);
+
 
   return (
     <MantineProvider
@@ -434,12 +465,18 @@ function Mindmap({ currId, setSmm }) {
         }
         styles={{
           main: {
-            backgroundColor: 'whitesmoke',
-            overflow: 'auto'
+            backgroundColor: 'whitesmoke'
           }
         }}
       >
-        <Box sx={{ display: active === "mindmap" ? 'block' : 'none' }}>
+        <ActionIcon size={50} variant="filled"
+          pos="fixed" top={15} right={15}
+          onClick={() => setSmm(false)}
+          sx={{ zIndex: 1 }}
+        >
+          <IconArrowBackUp size={40} />
+        </ActionIcon>
+        <Box sx={{ display: active === "mindmap" ? 'block' : 'none' }} pos="relative">
           <Canvas background={background} nodeList={nodeList} nodeGraph={nodeGraph} setNg={setNg}
             nodeRefs={nodeRefs} currNode={currNode}
             disconnectMode={disconnectMode} setDm={setDm}
@@ -520,59 +557,22 @@ function Mindmap({ currId, setSmm }) {
             </Drawer.Content>
           </Drawer.Root>
           <ActionIcon size={50} variant="filled"
-            pos="fixed" top={15} right={15}
+            pos="fixed" top={15} right={15 + 50 + 15}
             onClick={open}
           >
             <IconSettings size={40} />
           </ActionIcon>
           <ActionIcon size={50} variant="filled"
-            pos="fixed" top={15} right={15 + 50 + 15}
+            pos="fixed" top={15} right={15 + 50 + 15 + 50 + 15}
             onClick={() => { setLoad(true); setSave(curr => !curr); }}
           >
             {load ? <Loader color="gray.0" variant="dots" /> : <IconDeviceFloppy size={40} />}
           </ActionIcon>
           <ActionIcon size={50} variant="filled"
-            pos="fixed" top={15} right={15 + 50 + 15 + 50 + 15}
-            onClick={() => {
-              alert(`
-              Đây là so sánh và phân tích mindmap thứ 2 so với mindmap ban đầu:
-
-              *Những điểm sai*:
-              
-              - Nguyễn Ái Quốc về Quảng Châu (Mỹ) - Sai, ông về Quảng Châu (Trung Quốc)
-              
-              - Thành lập Hội vào tháng 6 năm 1929 - Sai, là tháng 6 năm 1925
-              
-              - Nền tảng tư tưởng là Chủ nghĩa Cộng sản - Sai, là Chủ nghĩa Mác-Lênin  
-              
-              - Thực hiện chủ trương “tư sản hoá” - Sai, là chủ trương “vô sản hoá”
-              
-              *Ưu điểm:* 
-              
-              - Cấu trúc chung tương tự mindmap ban đầu
-              
-              - Một số nội dung chính vẫn đúng
-              
-              *Nhược điểm:*
-              
-              - Một số thông tin quan trọng sai sót 
-              
-              - Thiếu logic, liên kết giữa các ý 
-              
-              - Chưa thể hiện rõ vai trò, vị trí của Hội
-              
-              Như vậy, mindmap thứ 2 vẫn còn một số điểm yếu về nội dung và cấu trúc. Cần chỉnh sửa các thông tin sai lệch, bổ sung thêm các ý quan trọng để hoàn thiện mindmap.
-              
-              `);
-            }}
+            pos="fixed" top={15} right={15 + 50 + 15 + 50 + 15 + 50 + 15}
+            onClick={check.open}
           >
             <IconCheck size={40} />
-          </ActionIcon>
-          <ActionIcon size={50} variant="filled"
-            pos="fixed" top={15} right={15 + 50 + 15 + 50 + 15 + 50 + 15}
-            onClick={() => setSmm(false)}
-          >
-            <IconArrowBackUp size={40} />
           </ActionIcon>
           <ActionIcon variant="filled" radius="xl" size={60} color="red.7"
             pos="fixed" bottom={40} right={60}
@@ -588,6 +588,14 @@ function Mindmap({ currId, setSmm }) {
           >
             <IconPlus size={32} />
           </ActionIcon>
+          <Modal opened={checkOpened} onClose={check.close} centered radius="lg">
+            abc
+            abc
+            abc
+            abc
+            abc
+            abc
+          </Modal>
           <Editor
             ref={newRef} opened={newOpened} openHandler={newHandler}
             iColor="Red" iSubject="" iBody="" iFile={null}
@@ -659,9 +667,29 @@ function Mindmap({ currId, setSmm }) {
         >
           {doc
             ?
-              <ScrollArea w="100%" offsetScrollbars p="sm">
-                <zero-md src={doc}></zero-md>
-              </ScrollArea>
+              <>
+                <ActionIcon size={50} variant="filled"
+                  pos="fixed" top={15} right={15 + 50 + 15} sx={{ zIndex: 1 }}
+                  onClick={() => {
+                    setDoc(null);
+                    setQuestions([]);
+                    fetch(`http://localhost:8080/api/v1/document/${currId}`, {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ content: "" })
+                    });
+                    fetch(`http://localhost:8080/api/v1/question/q/all/${currId}`, {
+                      method: "DELETE",
+                      headers: { "Content-Type": "application/json" }
+                    });
+                  }}
+                >
+                  <IconTrash size={40} />
+                </ActionIcon>
+                <ScrollArea w="100%" offsetScrollbars p="sm">
+                  <zero-md src={doc}></zero-md>
+                </ScrollArea>
+              </>
             :
               <FileButton variant="outline"
                 onChange={e => {
@@ -672,65 +700,124 @@ function Mindmap({ currId, setSmm }) {
                       method: "PUT",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ content: text })
+                    })
+                    .then(_ => {
+                      fetch(`http://localhost:8080/api/v1/file/generate-question/${currId}`, {
+                        headers: { "Content-Type": "application/json" }
+                      })
+                      .then(res => res.json())
+                      .then(json => setQuestions(curr => curr.slice().concat(json.content)));
                     });
                   });
                 }}
                 accept=".md"
               >
-                {props => <Button {...props}>Upload Document</Button>}
+                {props => <Button {...props}>Đăng Tài Liệu</Button>}
               </FileButton>
           }
         </Paper>
         <Paper m={15} radius="xl" p="md" mih="calc(100% - 2 * 15px)"
           sx={{
-            display: active === "questions" ? 'block' : 'none'
+            display: active === "questions" ? 'flex' : 'none',
+            flexDirection: "column"
           }}
         >
-          <Question q={{
-    question: "Tổ chức cách mạng ra đời năm nào?",
-    answer: [
-        "1925",
-        "1924", 
-        "1926",
-        "1930"
-    ]
-}} />
-      <Question q={{
-    question: "Ai là người sáng lập tổ chức cách mạng thanh niên?", 
-    answer: [
-        "Nguyễn Ái Quốc",
-        "Hồ Chí Minh",
-        "Lê Duẩn", 
-        "Tôn Đức Thắng"
-    ]  
-}} />
-    <Question q={{
-    question: "Tổ chức cách mạng có hoạt động ở địa bàn nào?",
-    answer: [
-        "Bắc Kỳ, Trung Kỳ, Nam Kỳ và Hải ngoại",
-        "Chỉ ở Bắc Kỳ",
-        "Chỉ ở Nam Kỳ",
-        "Chỉ ở nước ngoài"
-    ]
-}} />
-    <Question q={{
-    question: "Tổ chức cách mạng có vai trò gì?",
-    answer: [
-       "Chuẩn bị cho sự ra đời của Đảng Cộng sản Việt Nam",  
-       "Chuẩn bị cho cuộc khởi nghĩa tháng Tám",
-       "Chuẩn bị cho cách mạng tháng Tám",
-       null  
-    ]
-}} />
-  <Question q={{
-    question: "Tổ chức cách mạng có xuất bản tờ báo nào?",
-    answer: [
-        "Báo Thanh Niên",
-        "Báo Nhân Dân",
-        "Báo Lao Động",
-        null
-    ]
-}} />
+          {!questions.length ?
+            <Center sx={{ flex: 1 }}>{doc ? <Loader color="gray" /> : "Hãy đăng tài liệu lên!"}</Center>
+            :
+            <>
+              <ActionIcon size={50} variant="filled"
+                pos="fixed" top={15} right={15 + 50 + 15} sx={{ zIndex: 1 }}
+                onClick={more.open}
+              >
+                <IconPencilPlus size={40} />
+              </ActionIcon>
+              <Modal opened={moreOpened} centered radius="lg" onClose={more.close}
+                withCloseButton={false} padding="md" shadow="xl" lockScroll={false}
+              >
+                <Group position="apart">
+                  <ActionIcon radius="xl" size="lg"
+                    onClick={more.close}
+                  >
+                    <IconX size="1.5rem" />
+                  </ActionIcon>
+                  <Button radius="xl" size="lg" compact color="pink.6"
+                    disabled={!ques.trim().length || !choices.length || !cCheck.some(e => e)}
+                    onClick={() => {
+                      const answers = [choices[currChoice]];
+                      for (let i = 0; i < choices.length; i++) {
+                        if (i !== currChoice) {
+                          answers.push(choices[i]);
+                        }
+                      }
+
+                      fetch(`http://localhost:8080/api/v1/question/q/${currId}`, {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                          question: ques,
+                          answers: answers
+                        })
+                      })
+                      .then(_ => {
+                        more.close();
+                        setQuestions(curr => [...curr, { question: ques, answers: answers }])
+                      });
+                    }}
+                  >Tạo</Button>
+                </Group>
+                <TextInput mt="md" placeholder="Câu hỏi" label="Câu hỏi" size="md"
+                  value={ques} onChange={e => setQues(e.currentTarget.value)}
+                />
+                <form onSubmit={form.onSubmit(val => {
+                    form.setFieldValue('choice', '');
+                    setChoices(curr => [...curr, val.choice]);
+                  })}
+                >
+                  <Text mt="md">Thêm lựa chọn</Text>
+                  <TextInput placeholder="Lựa chọn" size="md"
+                    {...form.getInputProps('choice')}
+                  />
+                  <Center mt="md"><Button type="submit">Thêm</Button></Center>
+                  <List {...(choices.length && { mt: "md" })} center spacing="sm">
+                    {choices.map((e, i) => 
+                      <List.Item
+                        icon={
+                          <ActionIcon variant="filled" radius="xl" color="red"
+                            onClick={() => {
+                              setChoices(curr => {
+                                const copy = curr.slice();
+                                copy.splice(i, 1);
+                                return copy;
+                              });
+                            }}
+                          >
+                            <IconX />
+                          </ActionIcon>
+                        }
+                      >
+                        <Checkbox labelPosition="left" label={e} radius="xl"
+                          checked={cCheck[i]}
+                          onChange={event => {
+                            const checked = event.currentTarget.checked;
+                            setCurrChoice(i);
+                            setCCheck(curr => {
+                              const copy = curr.slice();
+                              copy[i] = checked;
+                              return copy;
+                            });
+                          }}
+                        />
+                      </List.Item>
+                    )}
+                  </List>
+                </form>
+              </Modal>
+            </>
+          }
+          {questions.map(e => <Question q={e} />)}
         </Paper>
       </AppShell>
     </MantineProvider>

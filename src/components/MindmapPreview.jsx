@@ -32,8 +32,8 @@ function MindmapPreview({ name, setSmm, id, setMml, setCurrId }) {
         >{name}</Text>
         <Image src={image ? URL.createObjectURL(image) : ''} sx={{ opacity: 0.4 }} />
       </Box>
-      <ActionIcon className="x-button" radius="xl" variant="filled" color="red" size="lg"
-        pos="absolute" top={-15} right={-15}
+      <ActionIcon className="x-button" radius="xl" variant="filled" color="red" size="xl"
+        pos="absolute" top={-20} right={-20}
         onClick={e => {
           e.stopPropagation();
           fetch(`http://localhost:8080/api/v1/file/${id}`, {

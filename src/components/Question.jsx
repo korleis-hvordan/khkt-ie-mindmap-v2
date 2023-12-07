@@ -1,71 +1,63 @@
 import { useState } from "react";
 
-import { Checkbox, Stack, Paper, Title, Button } from "@mantine/core";
+import { Checkbox, Stack, Paper, Title, Button, Text } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
 
 function Question({ q }) {
-  const [c1, setC1] = useState(false);
-  const [c2, setC2] = useState(false);
-  const [c3, setC3] = useState(false);
-  const [c4, setC4] = useState(false);
+  const [ans, setAns] = useState([]);
+  const [currAns, setCurrAns] = useState(null);
+
+  const [res, setRes] = useState(null);
 
   useDidUpdate(() => {
-    if (c1) {
-      setC2(false);
-      setC3(false);
-      setC4(false);
-    }
-  }, [c1]);
-
-  useDidUpdate(() => {
-    if (c2) {
-      setC1(false);
-      setC3(false);
-      setC4(false);
-    }
-  }, [c2]);
-
-  useDidUpdate(() => {
-    if (c3) {
-      setC2(false);
-      setC1(false);
-      setC4(false);
-    }
-  }, [c3]);
-
-  useDidUpdate(() => {
-    if (c4) {
-      setC2(false);
-      setC3(false);
-      setC1(false);
-    }
-  }, [c4]);
+    setAns(curr => {
+      const copy = curr.slice();
+      for (let i = 0; i < copy.length; i++) {
+        if (i !== currAns) {
+          copy[i] = false;
+        }
+      }
+      return copy;
+    });
+  }, [currAns]);
 
   return (
     <Paper sx={{ boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px' }} m="sm" p="sm" pl="lg" radius="lg">
       <Title order={4}>{q.question}</Title>
       <Stack spacing="lg" my="md">
-        <Checkbox checked={c1} onChange={e => setC1(e.currentTarget.checked)} label={q.answer[0]}
-          radius="xl"
-        />
-        <Checkbox checked={c2} onChange={e => setC2(e.currentTarget.checked)} label={q.answer[1]}
-          radius="xl"
-        />
-        <Checkbox checked={c3} onChange={e => setC3(e.currentTarget.checked)} label={q.answer[2]}
-          radius="xl"
-        />
-        <Checkbox checked={c4} onChange={e => setC4(e.currentTarget.checked)} label={q.answer[3]}
-          radius="xl"
-        />
+        {q.answers.map((e, i) =>
+          <Checkbox key={i} checked={ans[i]} onChange={event => {
+              const checked = event.currentTarget.checked;
+              setCurrAns(i);
+              setAns(curr => {
+                const copy = curr.slice();
+                copy[i] = checked;
+                return copy;
+              });
+            }}
+            label={e}
+            radius="xl"
+          />
+        )}
       </Stack>
+      {res ?
+        <Text mb="md" color="green">Đáp án đúng!</Text>
+        :
+        res === false ?
+        <Text mb="md" color="red">Đáp án sai!</Text>
+        : null
+      }
       <Button radius="xl"
         onClick={() => {
-          if (c1) {
-            alert('Đáp án đúng');
+          let i = 0;
+          for (; i < q.answers.length; i++) {
+            if (ans[i]) {
+              break;
+            }
           }
-          else {
-            alert('Đáp án sai');
-          }
+          fetch(`http://localhost:8080/api/v1/question/q/check/${q.id}`,
+            { method: "POST", headers: { "Content-Type": "plain/text" }, body: q.answers[i] })
+          .then(res => res.json()).then(json => setRes(json))
         }}
       >Kiểm tra</Button>
     </Paper>

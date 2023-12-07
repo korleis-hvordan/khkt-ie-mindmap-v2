@@ -83,6 +83,11 @@ function App() {
                     method: "POST", 
                     headers: { "Content-Type": "application/json" }
                   });
+
+                  fetch(`http://localhost:8080/api/v1/question/${json.id}`, {
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json" }
+                  });
                   
                   setMml(curr => [...curr,
                     {
@@ -100,7 +105,7 @@ function App() {
                 }}
               >Tạo</Button>
             </Group>
-            <TextInput mt="md" placeholder="Mindmap name" label="Name" size="md"
+            <TextInput mt="md" placeholder="Tên Mindmap" label="Tên" size="md"
               value={name} onChange={e => setName(e.currentTarget.value)}
             />
           </Modal>
