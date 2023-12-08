@@ -706,7 +706,7 @@ function Mindmap({ currId, setSmm }) {
                         headers: { "Content-Type": "application/json" }
                       })
                       .then(res => res.json())
-                      .then(json => setQuestions(curr => curr.slice().concat(json.content)));
+                      .then(json => setQuestions(curr => curr.slice().concat(json)));
                     });
                   });
                 }}
@@ -761,9 +761,10 @@ function Mindmap({ currId, setSmm }) {
                           answers: answers
                         })
                       })
-                      .then(_ => {
+                      .then(res => res.json())
+                      .then(json => {
                         more.close();
-                        setQuestions(curr => [...curr, { question: ques, answers: answers }]);
+                        setQuestions(curr => [...curr, json]);
                         setQues("");
                         form.setFieldValue('choice', '');
                         setCCheck([]);
