@@ -421,6 +421,7 @@ function Mindmap({ currId, setSmm }) {
     });
   }, [currChoice]);
 
+  const [load2, setLoad2] = useState(false);
 
   return (
     <MantineProvider
@@ -731,6 +732,23 @@ function Mindmap({ currId, setSmm }) {
                 onClick={more.open}
               >
                 <IconPencilPlus size={40} />
+              </ActionIcon>
+              <ActionIcon size={50} variant="filled"
+                pos="fixed" top={15} right={15 + 50 + 15 + 15 + 50} sx={{ zIndex: 1 }}
+                onClick={() => {
+                  setLoad2(true);
+
+                  fetch(`http://localhost:8080/api/v1/file/generate-question/${currId}`, {
+                    headers: { "Content-Type": "application/json" }
+                  })
+                  .then(res => res.json())
+                  .then(json => {
+                    setQuestions(curr => curr.slice().concat(json));
+                    setLoad2(false);
+                  });
+                }}
+              >
+                {load2 ? <Loader color="gray.0" variant="dots" /> : <IconPlus size={40} />}
               </ActionIcon>
               <Modal opened={moreOpened} centered radius="lg" onClose={more.close}
                 withCloseButton={false} padding="md" shadow="xl" lockScroll={false}
