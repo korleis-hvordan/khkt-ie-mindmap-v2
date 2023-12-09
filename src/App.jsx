@@ -74,20 +74,25 @@ function App() {
 
                   const json = await res.json();
 
-                  fetch(`http://localhost:8080/api/v1/mindmap/${json.id}`, {
-                    method: "POST", 
-                    headers: { "Content-Type": "application/json" }
-                  });
+                  const [res1, res2, res3] = await Promise.all([
+                    fetch(`http://localhost:8080/api/v1/mindmap/${json.id}`, {
+                      method: "POST", 
+                      headers: { "Content-Type": "application/json" }
+                    }),
+                    fetch(`http://localhost:8080/api/v1/document/${json.id}`, {
+                      method: "POST", 
+                      headers: { "Content-Type": "application/json" }
+                    }),
+                    fetch(`http://localhost:8080/api/v1/question/${json.id}`, {
+                      method: "POST", 
+                      headers: { "Content-Type": "application/json" }
+                    })
+                  ]);
 
-                  fetch(`http://localhost:8080/api/v1/document/${json.id}`, {
-                    method: "POST", 
-                    headers: { "Content-Type": "application/json" }
-                  });
-
-                  fetch(`http://localhost:8080/api/v1/question/${json.id}`, {
-                    method: "POST", 
-                    headers: { "Content-Type": "application/json" }
-                  });
+                  if (res1.status !== 200 || res2.status !== 200 || res3.status !== 200) {
+                    alert('error');
+                    return;
+                  }
                   
                   setMml(curr => [...curr,
                     {

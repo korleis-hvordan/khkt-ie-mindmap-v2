@@ -74,7 +74,7 @@ const Edges = forwardRef(({ graph, nodeRefs, currNode, EdgeComponent }, ref) => 
           }
 
           copy.push(
-            <EdgeComponent position="absolute" top={top} left={left} />
+            <EdgeComponent top={top} left={left} />
           );
         });
       });

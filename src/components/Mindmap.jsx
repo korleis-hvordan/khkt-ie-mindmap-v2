@@ -386,13 +386,16 @@ function Mindmap({ currId, setSmm }) {
       body: JSON.stringify({ title: title })
     })]);
 
-    fetch(`http://localhost:8080/api/v1/file/check-mindmap/${currId}`,{
-      headers: { "Content-Type": "plain/text" }
-    })
-    .then(res => res.text()).then(text => {
-      setFeedback(text);
-      setLoad3(false);
-    });
+    setLoad3(true);
+    if (document) {
+      fetch(`http://localhost:8080/api/v1/file/check-mindmap/${currId}`,{
+        headers: { "Content-Type": "plain/text" }
+      })
+      .then(res => res.text()).then(text => {
+        setFeedback(text);
+        setLoad3(false);
+      });
+    }
 
     setLoad(false);
 
@@ -582,7 +585,7 @@ function Mindmap({ currId, setSmm }) {
           </ActionIcon>
           <ActionIcon size={50} variant="filled"
             pos="fixed" top={15} right={15 + 50 + 15 + 50 + 15}
-            onClick={() => { setLoad(true); setLoad3(true); setSave(curr => !curr); }}
+            onClick={() => { setLoad(true); setSave(curr => !curr); }}
           >
             {load ? <Loader color="gray.0" variant="dots" /> : <IconDeviceFloppy size={40} />}
           </ActionIcon>
@@ -608,7 +611,13 @@ function Mindmap({ currId, setSmm }) {
           </ActionIcon>
           <Modal opened={checkOpened} centered radius="lg" onClose={check.close}>
             <Center>
-              {load3 ? <Loader color="gray" /> : feedback ?? "Mindmap quá nhỏ để có thể so sánh"}
+              {load3 ? <Loader color="gray" /> :
+                <Text sx={{ whiteSpace: "pre-line" }}>
+                  {doc ?
+                  (feedback ?? "Mindmap quá nhỏ để có thể so sánh!")
+                  : "Hãy đăng tài liệu lên!"}
+                </Text>
+              }
             </Center>
           </Modal>
           <Editor
@@ -738,7 +747,8 @@ function Mindmap({ currId, setSmm }) {
           }}
         >
           {!questions.length ?
-            <Center sx={{ flex: 1 }}>{doc ? <Loader color="gray" /> : "Hãy đăng tài liệu lên!"}</Center>
+            <Center sx={{ flex: 1 }}>{doc ? <Loader color="gray" /> :
+              <Text>{"Hãy đăng tài liệu lên!"}</Text>}</Center>
             :
             <>
               <ActionIcon size={50} variant="filled"

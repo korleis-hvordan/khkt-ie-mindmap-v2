@@ -183,7 +183,7 @@ export default function Canvas({ background, nodeList, nodeGraph, setNg, nodeRef
       {disconnectMode && <Edges ref={disconnectRef}
         graph={disconnectGraph} nodeRefs={nodeRefs} currNode={currNode}
         EdgeComponent={({ ...props }) =>
-          <ActionIcon size="2rem" variant="filled" radius="xl" color="orange"
+          <ActionIcon size="2rem" variant="filled" radius="xl" color="orange" pos="absolute"
             {...props}
             onClick={() => {
               setNg(curr => {
