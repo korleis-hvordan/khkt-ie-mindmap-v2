@@ -129,6 +129,7 @@ function Mindmap({ currId, setSmm }) {
                       width: 200,
                       color: 'Red',
                       label: json.title,
+                      subject: json.title,
                       body: '',
                       file: null,
                       children: []
@@ -167,7 +168,7 @@ function Mindmap({ currId, setSmm }) {
             }
 
             nodeList[v.index] = 
-              makeNode(v.index, v.color, v.label, v.body, v.file, v.width, { x: v.x, y: v.y });
+              makeNode(v.index, v.color, v.subject, v.body, v.file, v.width, { x: v.x, y: v.y });
 
             for (const x of v.children) {
               if (!visited[x.index]) {
@@ -189,6 +190,7 @@ function Mindmap({ currId, setSmm }) {
           setCf(json.mindMap.content.font);
 
           setQuestions(json.question.content);
+          setFeedback(json.mindMap.feedback);
         }
         setTitle(json.title);
       });
@@ -271,7 +273,8 @@ function Mindmap({ currId, setSmm }) {
             y: nodeRefs.current[0].getOffset().y,
             width: nodeRefs.current[0].getSize().width,
             color: nodeRefs.current[0].getColor(),
-            label: nodeRefs.current[0].getSubject(),
+            label: nodeRefs.current[0].getSubject() + ". " + nodeRefs.current[0].getBody(),
+            subject: nodeRefs.current[0].getSubject(),
             body: nodeRefs.current[0].getBody(),
             file: await imgToBase64(nodeRefs.current[0].getFile()),
             children: []
@@ -301,7 +304,8 @@ function Mindmap({ currId, setSmm }) {
               y: nodeRefs.current[v].getOffset().y,
               width: nodeRefs.current[v].getSize().width,
               color: nodeRefs.current[v].getColor(),
-              label: nodeRefs.current[v].getSubject(),
+              label: nodeRefs.current[v].getSubject() + ". " + nodeRefs.current[v].getBody(),
+              subject: nodeRefs.current[v].getSubject(),
               body: nodeRefs.current[v].getBody(),
               file: await imgToBase64(nodeRefs.current[v].getFile()),
               children: []
@@ -339,7 +343,8 @@ function Mindmap({ currId, setSmm }) {
             y: nodeRefs.current[start].getOffset().y,
             width: nodeRefs.current[start].getSize().width,
             color: nodeRefs.current[start].getColor(),
-            label: nodeRefs.current[start].getSubject(),
+            label: nodeRefs.current[start].getSubject() + ". " + nodeRefs.current[start].getBody(),
+            subject: nodeRefs.current[start].getSubject(),
             body: nodeRefs.current[start].getBody(),
             file: await imgToBase64(nodeRefs.current[start].getFile()),
             children: []
@@ -361,7 +366,8 @@ function Mindmap({ currId, setSmm }) {
           y: nodeRefs.current[i].getOffset().y,
           width: nodeRefs.current[i].getSize().width,
           color: nodeRefs.current[i].getColor(),
-          label: nodeRefs.current[i].getSubject(),
+          label: nodeRefs.current[i].getSubject() + ". " + nodeRefs.current[i].getBody(),
+          subject: nodeRefs.current[i].getSubject(),
           body: nodeRefs.current[i].getBody(),
           file: await imgToBase64(nodeRefs.current[i].getFile()),
           children: []
@@ -379,6 +385,14 @@ function Mindmap({ currId, setSmm }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: title })
     })]);
+
+    fetch(`http://localhost:8080/api/v1/file/check-mindmap/${currId}`,{
+      headers: { "Content-Type": "plain/text" }
+    })
+    .then(res => res.text()).then(text => {
+      setFeedback(text);
+      setLoad3(false);
+    });
 
     setLoad(false);
 
@@ -422,6 +436,9 @@ function Mindmap({ currId, setSmm }) {
   }, [currChoice]);
 
   const [load2, setLoad2] = useState(false);
+
+  const [feedback, setFeedback] = useState(null);
+  const [load3, setLoad3] = useState(false);
 
   return (
     <MantineProvider
@@ -565,7 +582,7 @@ function Mindmap({ currId, setSmm }) {
           </ActionIcon>
           <ActionIcon size={50} variant="filled"
             pos="fixed" top={15} right={15 + 50 + 15 + 50 + 15}
-            onClick={() => { setLoad(true); setSave(curr => !curr); }}
+            onClick={() => { setLoad(true); setLoad3(true); setSave(curr => !curr); }}
           >
             {load ? <Loader color="gray.0" variant="dots" /> : <IconDeviceFloppy size={40} />}
           </ActionIcon>
@@ -589,13 +606,10 @@ function Mindmap({ currId, setSmm }) {
           >
             <IconPlus size={32} />
           </ActionIcon>
-          <Modal opened={checkOpened} onClose={check.close} centered radius="lg">
-            abc
-            abc
-            abc
-            abc
-            abc
-            abc
+          <Modal opened={checkOpened} centered radius="lg" onClose={check.close}>
+            <Center>
+              {load3 ? <Loader color="gray" /> : feedback ?? "Mindmap quá nhỏ để có thể so sánh"}
+            </Center>
           </Modal>
           <Editor
             ref={newRef} opened={newOpened} openHandler={newHandler}
@@ -841,7 +855,7 @@ function Mindmap({ currId, setSmm }) {
               </Modal>
             </>
           }
-          {questions.map(e => <Question q={e} />)}
+          {questions.map(e => <Question q={e} setQuestions={setQuestions} />)}
         </Paper>
       </AppShell>
     </MantineProvider>

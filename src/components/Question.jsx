@@ -1,9 +1,11 @@
 import { useState } from "react";
 
-import { Checkbox, Stack, Paper, Title, Button, Text } from "@mantine/core";
+import { Checkbox, Stack, Paper, Title, Button, Text, Group, ActionIcon } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
 
-function Question({ q }) {
+import { IconX } from "@tabler/icons-react";
+
+function Question({ q, setQuestions }) {
   const [ans, setAns] = useState([]);
   const [currAns, setCurrAns] = useState(null);
 
@@ -47,19 +49,37 @@ function Question({ q }) {
         <Text mb="md" color="red">Đáp án sai!</Text>
         : null
       }
-      <Button radius="xl"
-        onClick={() => {
-          let i = 0;
-          for (; i < q.answers.length; i++) {
-            if (ans[i]) {
-              break;
+      <Group position="apart">
+
+        <Button radius="xl"
+          onClick={() => {
+            let i = 0;
+            for (; i < q.answers.length; i++) {
+              if (ans[i]) {
+                break;
+              }
             }
-          }
-          fetch(`http://localhost:8080/api/v1/question/q/check/${q.id}`,
-            { method: "POST", headers: { "Content-Type": "plain/text" }, body: q.answers[i] })
-          .then(res => res.json()).then(json => setRes(json))
-        }}
-      >Kiểm tra</Button>
+            fetch(`http://localhost:8080/api/v1/question/q/check/${q.id}`,
+              { method: "POST", headers: { "Content-Type": "plain/text" }, body: q.answers[i] })
+            .then(res => res.json()).then(json => setRes(json))
+          }}
+        >Kiểm tra</Button>
+        <ActionIcon variant="filled" radius="xl" color="red"
+          onClick={() => {
+            setQuestions(curr => {
+              const copy = curr.slice();
+              const index = copy.findIndex(e => e.id === q.id);
+              copy.splice(index, 1);
+              return copy;
+            });
+            fetch(`http://localhost:8080/api/v1/question/q/${q.id}`, {
+              method: "DELETE", headers: { "Content-Type": "plain/text" }
+            });
+          }}
+        >
+          <IconX />
+        </ActionIcon>
+      </Group>
     </Paper>
   );
 }
