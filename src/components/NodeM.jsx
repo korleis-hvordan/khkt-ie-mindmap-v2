@@ -249,7 +249,7 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
               >
                 <IconEdit />
               </ThemeIcon>
-              Edit post
+              Chỉnh bài đăng
             </Group>
           </Menu.Item>
           <Menu.Divider />
@@ -262,7 +262,7 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
               >
                 <IconLink />
               </ThemeIcon>
-              Connect to a post
+              Nối bài đăng
             </Group>
           </Menu.Item>
           <Menu.Item fz="lg"
@@ -274,11 +274,12 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
               >
                 <IconLinkOff />
               </ThemeIcon>
-              Disconnect from a post
+              Gỡ nối bài đăng
             </Group>
           </Menu.Item>
           <Menu.Divider />
           <Menu.Item fz="lg"
+            disabled={index === 0}
             color="red"
             onClick={() => {
               setNl(curr => {
@@ -306,7 +307,7 @@ const NodeM = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, setCn, s
               >
                 <IconTrash />
               </ThemeIcon>
-              Delete post
+              Xóa bài đăng
             </Group>
           </Menu.Item>
         </Menu.Dropdown>

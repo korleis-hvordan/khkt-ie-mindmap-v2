@@ -210,7 +210,7 @@ function Mindmap({ currId, setSmm }) {
       if (connectTarget !== null && !(nodeGraph[connectSource]?.has(connectTarget) ||
           nodeGraph[connectTarget]?.has(connectSource))) {
         setNg(curr => {
-          const copy = curr.slice();
+          const copy = structuredClone(curr);
           if (typeof(copy[connectSource]) === 'object') {
             copy[connectSource].add(connectTarget);
           }
@@ -223,6 +223,30 @@ function Mindmap({ currId, setSmm }) {
           }
           else {
             copy[connectTarget] = new Set([connectSource]);
+          }
+
+          let visited = [];
+
+          function dfs(v, p=-1) {
+            visited[v] = true;
+
+            for (const x of copy[v]) {
+              if (!visited[x]) {
+                if (dfs(x, v)) {
+                  return true;
+                }
+              }
+              else if (x !== p) {
+                return true;
+              }
+            }
+
+            return false;
+          }
+
+          if (dfs(connectSource)) {
+            connect.open()
+            return curr;
           }
 
           return copy;
@@ -284,7 +308,7 @@ function Mindmap({ currId, setSmm }) {
       }
     }
 
-    let visited = new Array(nodeList.length).fill(false);
+    let visited = [];
     let cock = [];
     async function dfs(source, v) {
       visited[v] = true;
@@ -387,7 +411,7 @@ function Mindmap({ currId, setSmm }) {
     })]);
 
     setLoad3(true);
-    if (document) {
+    if (doc) {
       fetch(`http://localhost:8080/api/v1/file/check-mindmap/${currId}`,{
         headers: { "Content-Type": "plain/text" }
       })
@@ -442,6 +466,8 @@ function Mindmap({ currId, setSmm }) {
 
   const [feedback, setFeedback] = useState(null);
   const [load3, setLoad3] = useState(false);
+
+  const [connectable, connect] = useDisclosure(false);
 
   return (
     <MantineProvider
@@ -670,17 +696,23 @@ function Mindmap({ currId, setSmm }) {
             position={{ bottom: 20, right: 20 }}
           >
             <Group>
-              Pick a post to connect to
-              <Button fz="xl" onClick={() => setCm(false)}>Cancel</Button>
+              Chọn một bài đăng để nối
+              <Button fz="xl" onClick={() => setCm(false)}>Hủy</Button>
             </Group>
           </Dialog>
           <Dialog opened={disconnectMode} radius="lg" py="xs" fz="xl" w="fit-content"
             position={{ bottom: 20, right: 20 }}
           >
             <Group>
-              Pick a post to disconnect from
-              <Button fz="xl" onClick={() => setDm(false)}>Cancel</Button>
+              Chộn một bài đăng để gỡ nối
+              <Button fz="xl" onClick={() => setDm(false)}>Hủy</Button>
             </Group>
+          </Dialog>
+          <Dialog opened={connectable} onClose={connect.close} size="lg" radius="lg" py="xs" fz="xl"
+            position={{ bottom: 20, right: 20 }}
+            withCloseButton
+          >
+            Không thể nối với bài đăng này!
           </Dialog>
         </Box>
         <Paper m={15} radius="xl" p="sm" mih="calc(100% - 2 * 15px)"

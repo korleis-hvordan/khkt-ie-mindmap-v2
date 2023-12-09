@@ -271,7 +271,7 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, iWidth, s
               >
                 <IconEdit />
               </ThemeIcon>
-              Edit post
+              Chỉnh bài đăng
             </Group>
           </Menu.Item>
           <Menu.Divider />
@@ -286,7 +286,7 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, iWidth, s
               >
                 <IconLink />
               </ThemeIcon>
-              Connect to a post
+              Nối bài đăng
             </Group>
           </Menu.Item>
           <Menu.Item fz="lg"
@@ -300,7 +300,7 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, iWidth, s
               >
                 <IconLinkOff />
               </ThemeIcon>
-              Disconnect from a post
+              Gỡ nối bài đăng
             </Group>
           </Menu.Item>
           <Menu.Divider />
@@ -335,7 +335,7 @@ const Node = forwardRef(({ index, pos, iColor, iSubject, iBody, iFile, iWidth, s
               >
                 <IconTrash />
               </ThemeIcon>
-              Delete post
+              Xóa bài đăng
             </Group>
           </Menu.Item>
         </Menu.Dropdown>
